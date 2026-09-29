@@ -1,0 +1,29 @@
+import { Page, Locator, expect } from '@playwright/test';
+
+export class InventoryPage {
+  readonly page: Page;
+  readonly title: Locator;
+  readonly menuButton: Locator;
+  readonly logoutLink: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+    this.title = page.locator('.title');
+    this.menuButton = page.getByRole('button', { name: /open menu/i });
+    this.logoutLink = page.locator('#logout_sidebar_link');
+  }
+
+  async expectLoaded() {
+    await expect(this.title).toHaveText('Products');
+  }
+
+  async logout() {
+    await this.menuButton.click();
+    await this.logoutLink.waitFor({ state: 'visible' });
+    await this.logoutLink.click();
+  }
+
+  productByName(name: string) {
+    return this.page.locator('.inventory_item').filter({ hasText: name });
+  }
+}
